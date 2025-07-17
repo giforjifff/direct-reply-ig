@@ -54,6 +54,13 @@ router.get('/facebook',(req, res) => {
     res.sendStatus(400);
   }
 });
+router.get('/webhooks', (req, res) => {
+  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.VERIFY_TOKEN) {
+    res.send(req.query['hub.challenge']);
+  } else {
+    res.sendStatus(400);
+  }
+});
 
 router.get('/notifications', (req, res) => {
   res.json(notifications);
