@@ -7,9 +7,11 @@
     "start": "node heroku/index.js"
   },
   "dependencies": {
+    "@vercel/kv": "^3.0.0",
     "body-parser": "~1.20.3",
     "express": "~4.13.3",
-    "express-x-hub": "^1.0.4"
+    "express-x-hub": "^1.0.4",
+    "redis": "^5.6.0"
   },
   "engines": {
     "node": "22.x"
