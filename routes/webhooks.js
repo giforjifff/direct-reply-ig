@@ -48,7 +48,7 @@ router.get('/instagram', (req, res) => {
   }
 });
 router.get('/facebook',(req, res) => {
-  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.VERIFY_TOKEN) {
+  if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === 'password-123-test') {
     res.send(req.query['hub.challenge']);
   } else {
     res.sendStatus(400);
