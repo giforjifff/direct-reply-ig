@@ -1,6 +1,6 @@
 // routes/admin.js
 import express from 'express';
-import { setPostDetails } from '../services/database.js';
+import { setPostDetails, allPostDetails } from '../services/database.js';
 
 const router = express.Router();
 
@@ -37,4 +37,19 @@ router.post('/postdata', async (req, res) => {
   }
 });
 
+router.get('/postdata', async (req, res) => {
+  if (req.headers['x-api-key'] !== process.env.INTERNAL_API_KEY) {
+    return res.status(401).send('Unauthorized');
+  }
+  else{
+    try {
+      const postDetails = await allPostDetails();
+      res.status(200).json(postDetails);
+    }
+    catch (error) {
+      console.error("Error in /postdata:", error);
+      res.status(500).send("Internal Server Error");
+    }
+  }
+});
 export default router;

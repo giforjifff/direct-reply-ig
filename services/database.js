@@ -1,21 +1,36 @@
-// services/database.js
 import { createClient } from 'redis';
 
-const reddis = ()=> createClient({
-  url: process.env.KV_REST_API_URL
-}).connect();
+const redisClient = createClient({
+  url: process.env.REDIS_URL
+});
+
+redisClient.on('error', err => console.error('Redis Client Error', err));
+
+(async () => {
+  await redisClient.connect();
+})();
+
 
 export async function getPostDetails(platform, postId) {
-  kv = await reddis();
   const key = `${platform}:${postId}`;
-  console.log(`Querying DB for key: ${key}`);
-  return await kv.get(key);
+  const data = await redisClient.get(key);
+  return data ? JSON.parse(data) : null;
 }
 
+export async function allPostDetails(){
+  const keys = await redisClient.keys('*');
+  const postDetails = {};
+  
+  for (const key of keys) {
+    const value = await redisClient.get(key);
+    postDetails[key] = value ? JSON.parse(value) : null;
+  }
+  
+  return postDetails;
+}
 
 export async function setPostDetails(platform, postId, links) {
-  kv = await reddis();
   const key = `${platform}:${postId}`;
-  console.log(`Setting data for key: ${key}`);
-  return await kv.set(key, links);
+  const value = JSON.stringify(links);
+  return await redisClient.set(key, value);
 }
