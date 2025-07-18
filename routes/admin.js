@@ -40,10 +40,6 @@ router.post('/postdata', async (req, res) => {
 });
 
 router.get('/postdata', async (req, res) => {
-  if (req.headers['x-api-key'] !== process.env.INTERNAL_API_KEY) {
-    return res.status(401).send('Unauthorized');
-  }
-  else{
     try {
       const postDetails = await allPostDetails();
       res.status(200).json(postDetails);
@@ -53,5 +49,5 @@ router.get('/postdata', async (req, res) => {
       res.status(500).send("Internal Server Error");
     }
   }
-});
+);
 export default router;
