@@ -6,6 +6,7 @@ import webhooksRouter from './routes/webhooks.js';
 import adminRouter from './routes/admin.js';
 
 const app = express();
+app.use(express.json());
 app.use(bodyParser.json());
 
 // Set up routes
