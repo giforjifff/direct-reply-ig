@@ -10,6 +10,8 @@ router.post('/postdata', async (req, res) => {
   }
 
   const { igPostId, fbPostId, amazonLink, flipkartLink } = req.body;
+  console.log("Received data:", req.body);
+  
 
   if ((!amazonLink && !flipkartLink) || (!igPostId && !fbPostId)) {
     return res.status(400).send('Missing required fields.');
