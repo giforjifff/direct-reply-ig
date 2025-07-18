@@ -13,7 +13,9 @@ router.post('/instagram', async (req, res) => {
 
   try {
     for (const entry of req.body.entry) {
-      ig_user_id = entry.id; 
+      const ig_user_id = entry.id; 
+      console.log('ig_user_id: ', ig_user_id);
+      
       const commentData = entry.changes[0].value;
       if (commentData.parent_id) continue; // Ignore replies to other comments
 
