@@ -1,16 +1,20 @@
 // services/messenger.js
 const PAGE_ACCESS_TOKEN = process.env.PAGE_ACCESS_TOKEN;
 
-async function apiRequest(platform, endpoint, method = 'POST', body = {}) {
+async function apiRequest(is_privatemessage, platform, endpoint, method = 'POST', body = {}) {
   const url = `https://graph.${platform}.com/v23.0/${endpoint}`;
-  body.access_token = PAGE_ACCESS_TOKEN;
-  
+  const head = {
+    'Content-Type': 'application/json',
+  }
+
+  if (is_privatemessage === true) {
+    head['Authorization'] = `Bearer ${PAGE_ACCESS_TOKEN}`;
+  }
+
   try {
     const response = await fetch(url, {
       method,
-      headers: { 'Content-Type': 'application/json',
-        'Authorization': `Bearer ${PAGE_ACCESS_TOKEN}` 
-       },
+      headers: head,
       body: JSON.stringify(body)
 
     });
@@ -19,7 +23,7 @@ async function apiRequest(platform, endpoint, method = 'POST', body = {}) {
     console.log(`API call to ${endpoint} successful.`);
     return data;
   } catch (error) {
-    console.error(`Error in API call to ${endpoint}:`, error);
+    console.error(`Error in API call to ${url}:`, error);
   }
 }
 
@@ -36,12 +40,13 @@ export async function sendInstagramPrivateReply(message, commentId, ig_user_id) 
     }
   };
 
-  return apiRequest('instagram', endpoint, 'POST', body);
+  return apiRequest(true, 'instagram', endpoint, 'POST', body);
 }
 
-export async function sendInstagramPublicReply(message, commentId) {
+export async function sendInstagramPublicReply(reply, commentId) {
+  const endpoint = `${commentId}/replies`;
   const body = {
-    message: message
+    message: reply
   };
-  return apiRequest('instagram',`${commentId}/replies`, 'POST', body);
+  return apiRequest(false, 'instagram', endpoint, 'POST', body);
 }

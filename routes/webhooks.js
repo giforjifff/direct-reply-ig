@@ -30,8 +30,9 @@ router.post('/instagram', async (req, res) => {
 
         if (links) {
           const message = `Here are the links!\n` + amazonMessage + flipkartMessage;
+          const reply = `DM sent! Please follow to recieve in the Inbox or check your message requests if you're not following our page :)`
           await sendInstagramPrivateReply(message, commentId, ig_user_id);
-          await sendInstagramPublicReply("DM sent! Please follow to recieve in the Inbox or check your message requests if you're not following our page :)", commentId);
+          await sendInstagramPublicReply(reply, commentId);
         } else {
           console.log(`No links found in DB for Instagram post: ${postId}`);
         }
