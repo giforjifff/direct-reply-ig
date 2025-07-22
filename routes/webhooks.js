@@ -23,8 +23,11 @@ router.post('/instagram', async (req, res) => {
       if (commentText.includes('link') || commentText.includes('price')) {
         const postId = commentData.media.id;
         const commentId = commentData.id;
-
+        console.log('commentdata: ', commentData);
+        
         const links = await getPostDetails('instagram', postId);
+        console.log(links);
+        
         const amazonMessage = links.amazon ? `Amazon: ${links.amazon} \n` : '';
         const flipkartMessage = links.flipkart ? `Flipkart: ${links.flipkart}` : '';
 

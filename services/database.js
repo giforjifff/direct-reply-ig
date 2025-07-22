@@ -13,7 +13,11 @@ redisClient.on('error', err => console.error('Redis Client Error', err));
 
 export async function getPostDetails(platform, postId) {
   const key = `${platform}:${postId}`;
+  console.log('key inside the getPostDetail function: ', key);
+  
   const data = await redisClient.get(key);
+  console.log('data inside the getPostDetail function: ', data);
+  
   return data ? JSON.parse(data) : null;
 }
 
