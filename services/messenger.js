@@ -19,6 +19,8 @@ async function apiRequest(is_privatemessage, platform, endpoint, method = 'POST'
 
     });
     const data = await response.json();
+    console.log(data);
+    
     if(data.error) throw new Error(JSON.stringify(data.error));
     console.log(`API call to ${endpoint} successful.`);
     return data;
