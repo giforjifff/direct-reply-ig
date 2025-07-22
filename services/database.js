@@ -1,19 +1,13 @@
 import { createClient } from 'redis';
 
-const redisClient = createClient({
+export const redisClient = createClient({
   url: process.env.REDIS_URL
 });
 
 redisClient.on('error', err => console.error('Redis Client Error', err));
-
-(async () => {
-  try {
-    await redisClient.connect();
-    console.log('Redis connected successfully!');
-  } catch (err) {
-    console.error('FAILED TO CONNECT TO REDIS', err);
-  }
-})();
+redisClient.on('connect', () => console.log('Redis client is connecting...'));
+redisClient.on('ready', () => console.log('Redis client is ready.'));
+redisClient.on('end', () => console.log('Redis client connection closed.'));
 
 
 export async function getPostDetails(platform, postId) {
