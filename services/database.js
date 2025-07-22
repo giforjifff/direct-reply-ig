@@ -13,7 +13,12 @@ redisClient.on('end', () => console.log('Redis client connection closed.'));
 export async function getPostDetails(platform, postId) {
   const key = `${platform}:${postId}`;
   console.log('key inside the getPostDetail function: ', key);
-  const all_data = await allPostDetails();
+  const all_data = fetch('direct-reply-ig.vercel.app/admin/postdata', {
+    method: 'GET',
+    headers: {
+      'Content-Type': 'application/json',
+    }
+  });
   console.log('data is : ', all_data[key]);
   
   const data = await redisClient.get(key);
