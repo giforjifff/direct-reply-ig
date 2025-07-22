@@ -18,7 +18,7 @@ async function startServer() {
 
     // 2. CONFIGURE Express routes AFTER the database is connected
     app.use('/admin', adminRouter);
-    app.use('/webhooks', webhooksRouter);
+    app.use('/', webhooksRouter);
 
     // Add a root route for health checks
     app.get('/', (req, res) => {
