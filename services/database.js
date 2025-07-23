@@ -12,7 +12,7 @@ redisClient.on('end', () => console.log('Redis client connection closed.'));
 
 export async function getPostDetails(platform, postId) {
   const key = `${platform}:${postId}`;
-  console.log('reddis client connected or not: ', redisClient);
+  console.log(redisClient.isOpen? 'Redis client is open.' : 'Redis client is not open.');
   
   console.log('key inside the getPostDetail function: ', key);
   const data = await redisClient.get(key);
