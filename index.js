@@ -12,7 +12,9 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
   try {
     // 1. CONNECT to Redis and wait for it to be ready
-    
+    console.log('Attempting to connect to Redis...');
+    await redisClient.connect();
+    console.log('Redis connected successfully!');
 
     // 2. CONFIGURE Express routes AFTER the database is connected
     app.use('/admin', adminRouter);
