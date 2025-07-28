@@ -1,8 +1,7 @@
 import { createClient } from 'redis';
 
 export const redisClient = createClient({
-  url: process.env.REDIS_URL,
-  legacyMode: true
+  url: process.env.REDIS_URL
 });
 
 redisClient.on('error', err => console.error('Redis Client Error', err));
@@ -10,9 +9,16 @@ redisClient.on('connect', () => console.log('Redis client is connecting...'));
 redisClient.on('ready', () => console.log('Redis client is ready.'));
 redisClient.on('end', () => console.log('Redis client connection closed.'));
 
+const connectRedis = async () => {
+  console.log('Attempting to connect to Redis...');
+  await redisClient.connect();
+  console.log('Redis connected successfully!');
+}
+
 
 export async function getPostDetails(platform, postId) {
   const key = `${platform}:${postId}`;
+  connectRedis()
   console.log(redisClient.isOpen? 'Redis client is open.' : 'Redis client is not open.');
   
   console.log('key inside the getPostDetail function: ', key);
@@ -23,6 +29,8 @@ export async function getPostDetails(platform, postId) {
 }
 
 export async function allPostDetails(){
+  connectRedis();
+  console.log(redisClient.isOpen? 'Redis client is open.' : 'Redis client is not open.');
   const keys = await redisClient.keys('*');
   const postDetails = {};
   
@@ -35,6 +43,8 @@ export async function allPostDetails(){
 }
 
 export async function setPostDetails(platform, postId, links) {
+  connectRedis();
+  console.log(redisClient.isOpen? 'Redis client is open.' : 'Redis client is  not open.');
   const key = `${platform}:${postId}`;
   const value = JSON.stringify(links);
   return await redisClient.set(key, value);
