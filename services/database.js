@@ -1,43 +1,84 @@
-import { createClient } from 'redis';
+import pg from 'pg';
 
-export const redisClient = createClient({
-  url: process.env.REDIS_URL
+const pool = new pg.Pool({
+  connectionString: process.env.SUPABASE_DB_URL, 
+
 });
 
-redisClient.on('error', err => console.error('Redis Client Error', err));
-redisClient.on('connect', () => console.log('Redis client is connecting...'));
-redisClient.on('ready', () => console.log('Redis client is ready.'));
-redisClient.on('end', () => console.log('Redis client connection closed.'));
+// Listen for errors on idle clients
+pool.on('error', (err, client) => {
+  console.error('Unexpected error on idle PostgreSQL client', err);
+  process.exit(-1);
+});
 
 
+export async function checkDbConnection() {
+  await pool.query('SELECT NOW()'); // A simple query to check if we can connect.
+}
 
 export async function getPostDetails(platform, postId) {
-  const key = `${platform}:${postId}`;
-  console.log(redisClient.isOpen? 'Redis client is open.' : 'Redis client is not open.');
-  const keys = await redisClient.keys('*');
-  console.log('All keys in Redis:', keys);
-  
-  console.log('key inside the getPostDetail function: ', key);
-  const data = await redisClient.get(key);
-  console.log('data inside the getPostDetail function: ', data);
-  
-  return data ? JSON.parse(data) : null;
-}
+  console.log(`Querying PG for key: ${platform}:${postId}`);
+  const query = {
+    text: 'SELECT links FROM posts WHERE platform = $1 AND post_id = $2',
+    values: [platform, postId],
+  };
 
-export async function allPostDetails(){
-  const keys = await redisClient.keys('*');
-  const postDetails = {};
-  
-  for (const key of keys) {
-    const value = await redisClient.get(key);
-    postDetails[key] = value ? JSON.parse(value) : null;
+  try {
+    const res = await pool.query(query);
+    if (res.rows.length > 0) {
+      console.log('Data found in PG:', res.rows[0].links);
+      return res.rows[0].links; // The 'links' column is already a JS object
+    }
+    console.log('No data found in PG for this key.');
+    return null; // No post found
+  } catch (err) {
+    console.error('Error in getPostDetails:', err);
+    throw err; // Re-throw the error to be handled by the route
   }
-  
-  return postDetails;
 }
 
+
+export async function allPostDetails() {
+  const query = 'SELECT platform, post_id, links FROM posts';
+  try {
+    const res = await pool.query(query);
+    
+    // Transform the array of rows into the key-value object format you had with Redis
+    const postDetails = {};
+    for (const row of res.rows) {
+      const key = `${row.platform}:${row.post_id}`;
+      postDetails[key] = row.links;
+    }
+    return postDetails;
+  } catch (err) {
+    console.error('Error in allPostDetails:', err);
+    throw err;
+  }
+}
+
+/**
+ * Sets or updates the links for a specific post. (This is an "upsert").
+ * @param {string} platform
+ * @param {string} postId
+ * @param {object} links
+ */
 export async function setPostDetails(platform, postId, links) {
-  const key = `${platform}:${postId}`;
-  const value = JSON.stringify(links);
-  return await redisClient.set(key, value);
+
+  const query = {
+    text: `
+      INSERT INTO posts (platform, post_id, links) 
+      VALUES ($1, $2, $3)
+      ON CONFLICT (platform, post_id) 
+      DO UPDATE SET links = EXCLUDED.links;
+    `,
+    values: [platform, postId, JSON.stringify(links)], // links must be stringified for the query
+  };
+
+  try {
+    await pool.query(query);
+    console.log(`Successfully set/updated details for ${platform}:${postId}`);
+  } catch (err) {
+    console.error('Error in setPostDetails:', err);
+    throw err;
+  }
 }

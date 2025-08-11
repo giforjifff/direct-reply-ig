@@ -3,7 +3,8 @@ import 'dotenv/config'
 import express from 'express';
 import webhooksRouter from './routes/webhooks.js';
 import adminRouter from './routes/admin.js';
-import { redisClient } from './services/database.js';
+import { checkDbConnection } from './services/database.js';
+
 
 const app = express();
 app.use(express.json());
@@ -13,8 +14,8 @@ async function startServer() {
   try {
     // 1. CONNECT to Redis and wait for it to be ready
     console.log('Attempting to connect to Redis...');
-    await redisClient.connect();
-    console.log('Redis connected successfully!');
+    await checkDbConnection(); // Check if we can connect to the database
+    console.log('Database connection successful!');
 
     // 2. CONFIGURE Express routes AFTER the database is connected
     app.use('/admin', adminRouter);
@@ -22,7 +23,7 @@ async function startServer() {
 
     // Add a root route for health checks
     app.get('/', (req, res) => {
-      res.status(200).send('Server is running and Redis is connected.');
+      res.status(200).send('Server is running and db is connected.');
     });
 
     // 3. LISTEN for requests only when everything is ready
