@@ -13,7 +13,7 @@ const PORT = process.env.PORT || 3000;
 async function startServer() {
   try {
     // 1. CONNECT to Redis and wait for it to be ready
-    console.log('Attempting to connect to Redis...');
+    console.log('Attempting to connect to database...');
     await checkDbConnection(); // Check if we can connect to the database
     console.log('Database connection successful!');
 
