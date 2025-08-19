@@ -1,7 +1,5 @@
 import pg from 'pg';
 
-console.log(process.env.SUPABASE_DB_URL);
-
 const pool = new pg.Pool({
   connectionString: process.env.SUPABASE_DB_URL, 
 
