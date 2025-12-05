@@ -8,14 +8,14 @@ const notifications = [];
 
 // Instagram Webhook
 router.post('/instagram', async (req, res) => {
-  res.sendStatus(200); // Respond immediately
+  // res.sendStatus(200); // Removed early response to prevent Vercel freezing the process
   notifications.push(req.body); // Store the notification for processing
 
   try {
     for (const entry of req.body.entry) {
-      const ig_user_id = entry.id; 
+      const ig_user_id = entry.id;
       console.log('ig_user_id: ', ig_user_id);
-      
+
       const commentData = entry.changes[0].value;
       if (commentData.parent_id) continue; // Ignore replies to other comments
 
@@ -24,10 +24,10 @@ router.post('/instagram', async (req, res) => {
         const postId = commentData.media.id;
         const commentId = commentData.id;
         console.log('commentdata: ', commentData);
-        
+
         const links = await getPostDetails('instagram', postId);
         console.log(links);
-        
+
         const amazonMessage = links.amazon ? `Amazon: ${links.amazon} \n` : '';
         const flipkartMessage = links.flipkart ? `Flipkart: ${links.flipkart}` : '';
 
@@ -41,8 +41,10 @@ router.post('/instagram', async (req, res) => {
         }
       }
     }
+    res.sendStatus(200); // Respond after processing
   } catch (error) {
     console.error('Error processing Instagram webhook:', error);
+    res.sendStatus(200); // Acknowledge receipt even on error
   }
 });
 
@@ -53,7 +55,7 @@ router.get('/instagram', (req, res) => {
     res.sendStatus(400);
   }
 });
-router.get('/facebook',(req, res) => {
+router.get('/facebook', (req, res) => {
   if (req.query['hub.mode'] === 'subscribe' && req.query['hub.verify_token'] === process.env.VERIFY_TOKEN) {
     res.send(req.query['hub.challenge']);
   } else {
