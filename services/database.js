@@ -2,15 +2,13 @@ import pg from 'pg';
 
 const pool = new pg.Pool({
   connectionString: process.env.SUPABASE_DB_URL,
-  max: 1, // Limit connections in serverless environment
-  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
-  connectionTimeoutMillis: 10000, // Timeout if connection takes too long
+
 });
 
 // Listen for errors on idle clients
 pool.on('error', (err, client) => {
   console.error('Unexpected error on idle PostgreSQL client', err);
-  // DO NOT exit the process in serverless - just log the error
+  process.exit(-1);
 });
 
 
