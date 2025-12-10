@@ -14,3 +14,7 @@ docker-compose.yml
 # backup files
 backup_db.json
 
+# Local tools
+local_db_tool.html
+
+

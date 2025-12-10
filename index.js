@@ -1,12 +1,14 @@
 // index.js
 import 'dotenv/config'
 import express from 'express';
+import cors from 'cors';
 import webhooksRouter from './routes/webhooks.js';
 import adminRouter from './routes/admin.js';
 import { checkDbConnection } from './services/database.js';
 
 
 const app = express();
+app.use(cors()); // Enable CORS for all routes
 app.use(express.json());
 const PORT = process.env.PORT || 3000;
 
