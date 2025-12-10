@@ -1,14 +1,16 @@
 import pg from 'pg';
 
 const pool = new pg.Pool({
-  connectionString: process.env.SUPABASE_DB_URL, 
-
+  connectionString: process.env.SUPABASE_DB_URL,
+  max: 1, // Limit connections in serverless environment
+  idleTimeoutMillis: 30000, // Close idle connections after 30 seconds
+  connectionTimeoutMillis: 10000, // Timeout if connection takes too long
 });
 
 // Listen for errors on idle clients
 pool.on('error', (err, client) => {
   console.error('Unexpected error on idle PostgreSQL client', err);
-  process.exit(-1);
+  // DO NOT exit the process in serverless - just log the error
 });
 
 
@@ -42,7 +44,7 @@ export async function allPostDetails() {
   const query = 'SELECT platform, post_id, links FROM posts';
   try {
     const res = await pool.query(query);
-    
+
     // Transform the array of rows into the key-value object format you had with Redis
     const postDetails = {};
     for (const row of res.rows) {
