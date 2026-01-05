@@ -20,8 +20,8 @@ async function apiRequest(is_privatemessage, platform, endpoint, method = 'POST'
     });
     const data = await response.json();
     console.log(data);
-    
-    if(data.error) throw new Error(JSON.stringify(data.error));
+
+    if (data.error) throw new Error(JSON.stringify(data.error));
     console.log(`API call to ${endpoint} successful.`);
     return data;
   } catch (error) {
@@ -30,6 +30,8 @@ async function apiRequest(is_privatemessage, platform, endpoint, method = 'POST'
 }
 
 export async function sendInstagramPrivateReply(message, commentId, ig_user_id) {
+  console.log("Sending private reply to Instagram");
+
   const endpoint = `${ig_user_id}/messages`;
 
   // CORRECT: Building the new request body structure
@@ -46,7 +48,9 @@ export async function sendInstagramPrivateReply(message, commentId, ig_user_id) 
 }
 
 export async function sendInstagramPublicReply(reply, commentId) {
-  const endpoint = `${commentId}/replies`;
+  console.log("Sending public reply to Instagram");
+
+  const endpoint = `${commentId}/replies?access_token=${PAGE_ACCESS_TOKEN}`;
   const body = {
     message: reply
   };
